@@ -1,0 +1,29 @@
+FACIAL FEATURE ANALYSIS REPORT
+==============================
+
+Image: 11727
+Image Size: 1024 x 1024 pixels
+Total Pixels: 1,048,576
+Features Detected: 18
+
+FEATURE DETAILS:
+Feature         Pixels     Coverage   Bounding Box             
+----------------------------------------------------------------------
+face_outline    283,902    27.08    % (np.int64(0), np.int64(0), np.int64(1023), np.int64(1023))
+hat             255,432    24.36    % (np.int64(116), np.int64(0), np.int64(795), np.int64(435))
+cloth           171,624    16.37    % (np.int64(0), np.int64(668), np.int64(1023), np.int64(355))
+skin            168,624    16.08    % (np.int64(234), np.int64(404), np.int64(545), np.int64(575))
+neck            42,740     4.08     % (np.int64(296), np.int64(724), np.int64(473), np.int64(299))
+nose            25,708     2.45     % (np.int64(426), np.int64(478), np.int64(177), np.int64(223))
+mouth           13,932     1.33     % (np.int64(392), np.int64(720), np.int64(245), np.int64(101))
+l_lip           11,524     1.10     % (np.int64(382), np.int64(718), np.int64(263), np.int64(153))
+r_ear           7,700      0.73     % (np.int64(180), np.int64(420), np.int64(73), np.int64(199))
+l_ear           6,480      0.62     % (np.int64(762), np.int64(432), np.int64(69), np.int64(183))
+r_brow          5,408      0.52     % (np.int64(274), np.int64(416), np.int64(189), np.int64(47))
+u_lip           4,932      0.47     % (np.int64(384), np.int64(706), np.int64(261), np.int64(35))
+hair            2,040      0.19     % (np.int64(220), np.int64(412), np.int64(581), np.int64(97))
+l_brow          1,720      0.16     % (np.int64(574), np.int64(432), np.int64(123), np.int64(29))
+neck_l          1,424      0.14     % (np.int64(752), np.int64(790), np.int64(27), np.int64(93))
+l_eye           1,164      0.11     % (np.int64(602), np.int64(480), np.int64(77), np.int64(19))
+r_eye           1,132      0.11     % (np.int64(348), np.int64(482), np.int64(67), np.int64(19))
+ear_r           892        0.09     % (np.int64(208), np.int64(592), np.int64(43), np.int64(37))

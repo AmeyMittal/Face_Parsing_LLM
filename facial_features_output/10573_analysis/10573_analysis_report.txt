@@ -9,11 +9,11 @@ Features Detected: 15
 FEATURE DETAILS:
 Feature         Pixels     Coverage   Bounding Box             
 ----------------------------------------------------------------------
+face_outline    233,107    22.23    % (np.int64(0), np.int64(0), np.int64(1023), np.int64(1023))
 hair            228,796    21.82    % (np.int64(110), np.int64(0), np.int64(705), np.int64(507))
 skin            218,368    20.83    % (np.int64(210), np.int64(220), np.int64(539), np.int64(661))
 cloth           110,028    10.49    % (np.int64(56), np.int64(778), np.int64(967), np.int64(245))
 neck            18,684     1.78     % (np.int64(316), np.int64(798), np.int64(329), np.int64(189))
-face_outline    17,470     1.67     % (np.int64(223), np.int64(182), np.int64(534), np.int64(718))
 nose            17,244     1.64     % (np.int64(458), np.int64(476), np.int64(131), np.int64(191))
 r_ear           10,760     1.03     % (np.int64(112), np.int64(380), np.int64(115), np.int64(215))
 ear_r           8,524      0.81     % (np.int64(138), np.int64(534), np.int64(633), np.int64(119))

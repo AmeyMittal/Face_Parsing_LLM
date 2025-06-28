@@ -1,5 +1,5 @@
-# Complete Facial Features Extraction System - Fixed for Codespaces
-# This version includes proper model loading and error handling
+# Complete Facial Features Extraction System - With Smart Face Outline
+# This version includes the SmartFaceOutlineDetector for better face outline detection
 
 import torch
 import torch.nn as nn
@@ -16,6 +16,10 @@ import torchvision.transforms as transforms
 import glob
 from pathlib import Path
 import shutil
+import warnings
+
+# Suppress warnings for cleaner output
+warnings.filterwarnings('ignore')
 
 # =============================================================================
 # CONFIGURATION
@@ -142,69 +146,100 @@ class FeatureFusionModule(nn.Module):
         return x * att
 
 # =============================================================================
-# FACE OUTLINE DETECTOR
+# SMART FACE OUTLINE DETECTOR
 # =============================================================================
 
-class SimpleFaceOutlineDetector:
-    """Simplified face outline detector"""
+class SmartFaceOutlineDetector:
+    """Smart face outline detection using edge and segmentation methods"""
     
     def __init__(self):
-        try:
-            from mtcnn import MTCNN
-            self.mtcnn = MTCNN()
-            print("✓ MTCNN loaded for face detection")
-        except Exception as e:
-            print(f"Warning: MTCNN not available: {e}")
-            self.mtcnn = None
-            # Fallback to OpenCV
-            self.face_cascade = cv2.CascadeClassifier(
-                cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
-            )
-    
+        print("✓ SmartFaceOutlineDetector initialized")
+
+    def _edge_based_outline(self, image):
+        """Edge-based outline detection"""
+        gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+        blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+        edges = cv2.Canny(blurred, 50, 150)
+        # Dilate to make edges thicker and connect them
+        kernel = np.ones((5,5),np.uint8)
+        dilated_edges = cv2.dilate(edges, kernel, iterations = 1)
+        return dilated_edges > 0
+
+    def _segmentation_based_outline(self, image):
+        """Segmentation-based outline detection"""
+        hsv = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+        # A more generous skin color range for robustness
+        lower_skin = np.array([0, 20, 50], dtype=np.uint8)
+        upper_skin = np.array([35, 255, 255], dtype=np.uint8)
+        skin_mask = cv2.inRange(hsv, lower_skin, upper_skin)
+        
+        # Clean up the mask
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11))
+        skin_mask = cv2.morphologyEx(skin_mask, cv2.MORPH_CLOSE, kernel)
+        skin_mask = cv2.morphologyEx(skin_mask, cv2.MORPH_OPEN, kernel)
+
+        contours, _ = cv2.findContours(skin_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        outline = np.zeros_like(skin_mask)
+        if contours:
+            largest_contour = max(contours, key=cv2.contourArea)
+            cv2.drawContours(outline, [largest_contour], -1, 255, 10) # Draw thick contour
+        return outline > 0
+
+    def _post_process_outline(self, outline_mask):
+        """Post-process the outline mask"""
+        if np.sum(outline_mask) == 0:
+            return outline_mask
+        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+        processed = cv2.morphologyEx(outline_mask.astype(np.uint8), cv2.MORPH_CLOSE, kernel, iterations=2)
+        return processed > 0
+
     def detect_face_outline(self, image_rgb):
-        """Detect face outline from image"""
+        """Main method to detect face outline"""
         h, w = image_rgb.shape[:2]
-        outline_mask = np.zeros((h, w), dtype=bool)
         
-        if self.mtcnn:
-            try:
-                detections = self.mtcnn.detect_faces(image_rgb)
-                if detections:
-                    # Get bounding box from detection
-                    x, y, w_box, h_box = detections[0]['box']
-                    # Create elliptical outline
-                    center = (x + w_box//2, y + h_box//2)
-                    axes = (w_box//2, h_box//2)
-                    
-                    # Create mask
-                    mask = np.zeros((h, w), dtype=np.uint8)
-                    cv2.ellipse(mask, center, axes, 0, 0, 360, 255, 8)
-                    outline_mask = mask > 0
-                    
-            except Exception as e:
-                print(f"MTCNN detection failed: {e}")
+        try:
+            # Step 1: Edge-based outline detection
+            edge_outline = self._edge_based_outline(image_rgb)
+            
+            # Step 2: Segmentation-based outline
+            seg_outline = self._segmentation_based_outline(image_rgb)
+            
+            # Step 3: Combine the results
+            combined_mask = edge_outline | seg_outline
+            
+            # Step 4: Post-process to get clean outline
+            final_outline = self._post_process_outline(combined_mask)
+            
+            return final_outline
+            
+        except Exception as e:
+            print(f"Warning: Face outline detection failed: {e}")
+            # Return empty mask as fallback
+            return np.zeros((h, w), dtype=bool)
+
+    def detect_face_outline_debug(self, image):
+        """Debug version that returns all intermediate masks"""
+        h, w = image.shape[:2]
         
-        # Fallback to basic detection
-        if not np.any(outline_mask):
-            outline_mask = self._basic_face_outline(image_rgb)
+        # Dictionary to hold all our step-by-step results
+        debug_results = {}
+
+        # Step 1: Edge-based outline detection
+        debug_results['1_Edge_Outline'] = self._edge_based_outline(image)
         
-        return outline_mask
-    
-    def _basic_face_outline(self, image_rgb):
-        """Basic face outline using OpenCV"""
-        gray = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2GRAY)
-        faces = self.face_cascade.detectMultiScale(gray, 1.1, 4)
+        # Step 2: Segmentation-based outline
+        debug_results['2_Segmentation_Outline'] = self._segmentation_based_outline(image)
         
-        h, w = image_rgb.shape[:2]
-        mask = np.zeros((h, w), dtype=np.uint8)
+        # Step 3: Combine the results
+        combined_mask = np.zeros((h, w), dtype=bool)
+        for mask in debug_results.values():
+            combined_mask |= mask
+        debug_results['3_Combined'] = combined_mask
+
+        # Step 4: Post-process to get clean outline
+        debug_results['4_Final_Post-Processed'] = self._post_process_outline(combined_mask)
         
-        if len(faces) > 0:
-            x, y, w_face, h_face = faces[0]  # Use first face
-            center = (x + w_face//2, y + h_face//2)
-            axes = (w_face//2, h_face//2)
-            cv2.ellipse(mask, center, axes, 0, 0, 360, 255, 8)
-        
-        return mask > 0
+        return debug_results
 
 # =============================================================================
 # COMPREHENSIVE FACE PARSER
@@ -235,7 +270,8 @@ class ComprehensiveFaceParser:
         ])
         
         self.model = None
-        self.face_outline_detector = SimpleFaceOutlineDetector()
+        # Use the new SmartFaceOutlineDetector
+        self.face_outline_detector = SmartFaceOutlineDetector()
     
     def get_distinct_colors(self):
         """Get distinct colors for each feature"""
@@ -335,7 +371,7 @@ class ComprehensiveFaceParser:
                 interpolation=cv2.INTER_NEAREST
             )
             
-            # Face outline
+            # Face outline using SmartFaceOutlineDetector
             face_outline_mask = self.face_outline_detector.detect_face_outline(original_array)
             
             return prediction_resized, original_array, face_outline_mask
@@ -575,7 +611,7 @@ def main():
     print("• Process all images in the specified directory")
     print("• Extract individual facial features (nose, eyes, mouth, etc.)")
     print("• Create separate image files for each feature")
-    print("• Generate face outline detection")
+    print("• Generate smart face outline detection using edge and segmentation")
     print("• Create complete overlay images") 
     print("• Generate detailed analysis reports")
     print("="*60)
@@ -594,7 +630,7 @@ def main():
         print(f"\n🎉 SUCCESS! Check the output directory: {Config.OUTPUT_BASE_PATH}")
         print("📁 Each image will have its own folder containing:")
         print("   • Individual feature images (nose.jpg, l_eye.jpg, etc.)")
-        print("   • Face outline image (face_outline.jpg)")
+        print("   • Smart face outline image (face_outline.jpg)")
         print("   • Complete overlay image (showing all features)")
         print("   • Analysis report (detailed statistics)")
     else:

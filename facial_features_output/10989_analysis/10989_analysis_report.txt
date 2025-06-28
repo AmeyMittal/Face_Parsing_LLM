@@ -10,11 +10,11 @@ FEATURE DETAILS:
 Feature         Pixels     Coverage   Bounding Box             
 ----------------------------------------------------------------------
 hair            384,920    36.71    % (np.int64(90), np.int64(36), np.int64(933), np.int64(987))
+face_outline    311,216    29.68    % (np.int64(0), np.int64(0), np.int64(1023), np.int64(1023))
 skin            211,968    20.21    % (np.int64(312), np.int64(156), np.int64(433), np.int64(795))
 neck            30,476     2.91     % (np.int64(354), np.int64(852), np.int64(347), np.int64(171))
 cloth           24,616     2.35     % (np.int64(676), np.int64(830), np.int64(347), np.int64(193))
 nose            22,944     2.19     % (np.int64(436), np.int64(462), np.int64(161), np.int64(225))
-face_outline    17,640     1.68     % (np.int64(242), np.int64(185), np.int64(504), np.int64(754))
 l_lip           8,676      0.83     % (np.int64(382), np.int64(740), np.int64(255), np.int64(83))
 u_lip           7,732      0.74     % (np.int64(388), np.int64(710), np.int64(245), np.int64(37))
 mouth           5,532      0.53     % (np.int64(404), np.int64(742), np.int64(211), np.int64(39))

@@ -1,0 +1,26 @@
+FACIAL FEATURE ANALYSIS REPORT
+==============================
+
+Image: 10166
+Image Size: 1024 x 1024 pixels
+Total Pixels: 1,048,576
+Features Detected: 15
+
+FEATURE DETAILS:
+Feature         Pixels     Coverage   Bounding Box             
+----------------------------------------------------------------------
+skin            332,000    31.66    % (np.int64(242), np.int64(184), np.int64(583), np.int64(805))
+face_outline    224,169    21.38    % (np.int64(153), np.int64(16), np.int64(797), np.int64(1007))
+hair            138,044    13.16    % (np.int64(188), np.int64(26), np.int64(739), np.int64(645))
+neck            35,544     3.39     % (np.int64(284), np.int64(736), np.int64(539), np.int64(287))
+nose            26,284     2.51     % (np.int64(414), np.int64(464), np.int64(197), np.int64(211))
+l_ear           17,772     1.69     % (np.int64(818), np.int64(482), np.int64(127), np.int64(261))
+mouth           15,184     1.45     % (np.int64(392), np.int64(716), np.int64(265), np.int64(83))
+r_ear           13,612     1.30     % (np.int64(158), np.int64(494), np.int64(87), np.int64(285))
+cloth           11,880     1.13     % (np.int64(184), np.int64(912), np.int64(635), np.int64(111))
+l_brow          8,924      0.85     % (np.int64(568), np.int64(400), np.int64(199), np.int64(89))
+l_lip           7,936      0.76     % (np.int64(380), np.int64(740), np.int64(283), np.int64(87))
+r_brow          7,636      0.73     % (np.int64(288), np.int64(402), np.int64(181), np.int64(89))
+u_lip           4,812      0.46     % (np.int64(386), np.int64(694), np.int64(275), np.int64(51))
+r_eye           1,248      0.12     % (np.int64(360), np.int64(480), np.int64(69), np.int64(21))
+l_eye           1,136      0.11     % (np.int64(604), np.int64(478), np.int64(69), np.int64(21))
